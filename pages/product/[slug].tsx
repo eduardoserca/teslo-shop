@@ -1,4 +1,4 @@
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 
 import { ShopLayout } from '@/components/layouts';
@@ -76,7 +76,7 @@ const ProductPage:NextPage<Props> = ({product}) => {
 }
 
 
-
+/** No usar SSR
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     
   const { slug } = ctx.query;
@@ -96,9 +96,53 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
           product
       }
   }
+}*/
+
+
+// You should use getStaticPaths if you’re statically pre-rendering pages that use dynamic routes
+export const getStaticPaths: GetStaticPaths = async (ctx) => {
+
+  const productSlugs = await  dbProducts.getAllProductSlug();
+
+  return {
+
+    paths: productSlugs.map(({slug}) =>({
+      params:{
+        slug
+      }
+    })),
+    
+    fallback: "blocking"
+  }
 }
 
 
+// You should use getStaticProps when:
+//- The data required to render the page is available at build time ahead of a user’s request.
+//- The data comes from a headless CMS.
+//- The data can be publicly cached (not user-specific).
+//- The page must be pre-rendered (for SEO) and be very fast — getStaticProps generates HTML and JSON files, both of which can be cached by a CDN for performance.
+export const getStaticProps: GetStaticProps = async ({params}) => {
+
+  const {slug = ''} = params as {slug: string};
+  const product = await dbProducts.getProductBySlug(slug);
+
+  if( !product ){
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {
+      product
+    }, 
+    revalidate: 60*60*24
+  }
+}
 
 
 
