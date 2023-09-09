@@ -4,6 +4,9 @@ import { Typography, Grid, Card, CardContent, Divider, Box, Button } from '@mui/
 
 
 const CartPage = () => {
+
+    
+
     return (
         <ShopLayout 
             title='Carrito - 3' 

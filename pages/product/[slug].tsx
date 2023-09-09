@@ -1,15 +1,16 @@
-import { GetServerSideProps, GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import { useState, useContext } from 'react';
+import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
+
+import { Grid, Box, Typography, Button, Chip } from '@mui/material';
+
+import { CartContext } from '@/context';
 
 import { ShopLayout } from '@/components/layouts';
 import { ProductSlideshow, SizeSelector } from '@/components/products';
-
-
 import { ItemCounter } from '@/components/ui';
-import { Grid, Box, Typography, Button } from '@mui/material';
 
-
-import { IProduct } from '@/interfaces';
+import { ICartProduct, IProduct, ISize } from '@/interfaces';
 import { dbProducts } from '@/database';
 
 
@@ -22,6 +23,45 @@ interface Props {
 
 const ProductPage:NextPage<Props> = ({product}) => {
 
+  const router = useRouter();
+
+  const { addProductToCart } = useContext(CartContext)
+
+  const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
+    _id: product._id,
+    description: product.description,
+    image: product.images[0],
+    price: product.price,
+    size: undefined,
+    slug: product.slug,
+    title: product.title,
+    gender: product.gender,
+    quantity: 1,
+  });
+
+  const selectedSizePadre = ( size: ISize ) => {
+    setTempCartProduct(currentProduct => ({
+      ...currentProduct,
+      size
+    }))    
+  }
+
+  const onAddproduct = () => {
+
+    if( !tempCartProduct.size ) { return; }
+
+    addProductToCart(tempCartProduct);    
+    router.push('/cart');
+  }
+
+  const onUpdateQuantity = (quantity: number) => {
+    setTempCartProduct(currentProduct => ({
+      ...currentProduct,
+      quantity
+    })
+
+    )
+  }
 
 
   return (
@@ -47,18 +87,41 @@ const ProductPage:NextPage<Props> = ({product}) => {
                 {/** cantidad */}
                 <Box sx={{ my:2} }>
                   <Typography variant='subtitle2'>Cantidad</Typography>
-                  <ItemCounter />
-                  <SizeSelector 
-                    //selectedSize={product.sizes[0]} 
-                    sizes={product.sizes} />
+                  
+                  <ItemCounter 
+                    currentValue={tempCartProduct.quantity}
+                    updateQuantity={onUpdateQuantity}
+                    maxValue={product.inStock > 10 ? 10: product.inStock  }
+
+                  />
+
+                  <SizeSelector                     
+                    sizes={product.sizes} 
+                    selectedSize={tempCartProduct.size}
+                    onSelectedSize={selectedSizePadre}
+                  />
                 </Box>
 
                 {/** Agregar al carrito */}
-                <Button color='secondary' className='circular-btn'>
-                  Agregar al carrito
-                </Button>
-
-                {/** <Chip label="No hay disponibles" color= "error" variant='outlined'/> */}
+                {
+                  (product.inStock > 0)
+                    ? (
+                        <Button 
+                          color='secondary' 
+                          className='circular-btn'
+                          onClick={onAddproduct}
+                          >
+                          {
+                            tempCartProduct.size 
+                              ? 'Agregar al carrito'
+                              : 'Seleccione una talla'                            
+                          }
+                        </Button>
+                    )
+                    :(
+                      <Chip label="No hay disponibles" color= "error" variant='outlined'/>
+                    )
+                }
 
                 {/** description */}
                 <Box sx={{ mt:3}}>
@@ -74,29 +137,6 @@ const ProductPage:NextPage<Props> = ({product}) => {
     </ShopLayout>
   )
 }
-
-
-/** No usar SSR
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    
-  const { slug } = ctx.query;
-  const product = await dbProducts.getProductBySlug(slug as string);
-
-  if( !product ){
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false
-      }
-    }
-  }
-
-  return {
-      props: {
-          product
-      }
-  }
-}*/
 
 
 // You should use getStaticPaths if you’re statically pre-rendering pages that use dynamic routes
