@@ -24,9 +24,6 @@ export const CartList:FC<Props> = ({ editable = false}) => {
         updateCartQuantity(product);
     }
 
-   
-
-
     return (
         <>
             {
