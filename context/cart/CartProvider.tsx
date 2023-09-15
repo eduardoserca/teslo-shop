@@ -1,24 +1,31 @@
 import { FC, PropsWithChildren, useReducer, useEffect } from 'react';
 import { CartContext, cartReducer } from '.';
-import { ICartProduct } from '@/interfaces';
+import { ICartProduct, IAddress } from '@/interfaces';
 
-import Cookie from 'js-cookie';
+import Cookies from 'js-cookie';
+
 
 
 export interface CartState {
+    isLoaded: boolean;
     cart: ICartProduct[];
     numberOfItems: number;
     subTotal: number;
     tax: number;
     total: number;
+
+    shippingAddress?:IAddress;
 }
 
+
 const CART_INITIAL_STATE: CartState = {
+    isLoaded: false,
     cart: [],
     numberOfItems: 0,
     subTotal: 0,
     tax: 0,
     total: 0,
+    shippingAddress: undefined,
 }
 
 interface Props extends PropsWithChildren {}
@@ -30,7 +37,7 @@ export const CartProvider:FC<Props> = ({children}) => {
 
     useEffect(() => {
         try {
-            const cookieProducts = Cookie.get('cart') ? JSON.parse(Cookie.get('cart')!) : [] ;
+            const cookieProducts = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')!) : [] ;
             dispatch({
                 type:'[Cart] - LoadCart from cookies | storage', 
                 payload: cookieProducts  
@@ -41,13 +48,16 @@ export const CartProvider:FC<Props> = ({children}) => {
                 payload: [] 
             });
         }
-        
-
+    }, [])
+    
+    useEffect(() => {
+        const shippingAddress =  Cookies.get('shippingAddress') ? JSON.parse(Cookies.get('shippingAddress')!) : undefined ;
+        dispatch({ type:'[Cart] - LoadAddress from Cookies', payload: shippingAddress });
     }, [])
     
 
     useEffect(() => {
-        Cookie.set('cart', JSON.stringify( state.cart ));
+        Cookies.set('cart', JSON.stringify( state.cart ));
     }, [state.cart])
     
     useEffect(() => {
@@ -115,6 +125,22 @@ export const CartProvider:FC<Props> = ({children}) => {
         dispatch({type: '[Cart] - Remove product in cart', payload: product})
     }
 
+    const updateAddress = (address:IAddress) => {
+        const shippingAddress: IAddress = {
+            firstName: address.firstName,
+            lastName: address.lastName,
+            address: address.address,
+            address2: address.address2 || '',
+            zip: address.zip,
+            city: address.city,
+            country: address.country,
+            phone: address.phone,
+        }
+
+        Cookies.set('shippingAddress', JSON.stringify( shippingAddress ));           
+        dispatch({type:'[Cart] - Update Address', payload: address});
+    }
+
 
     return (
         <CartContext.Provider value ={{
@@ -124,6 +150,7 @@ export const CartProvider:FC<Props> = ({children}) => {
             addProductToCart,
             updateCartQuantity,
             removeCartProduct,
+            updateAddress,
         }}>
             { children }
         </CartContext.Provider>

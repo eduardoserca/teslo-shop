@@ -1,11 +1,13 @@
 import { FC, PropsWithChildren, useEffect, useReducer } from 'react';
-import { AuthContext, authReducer } from '.';
+import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import Cookies from "js-cookie";
 
+import { AuthContext, authReducer } from '.';
 import { IUser } from '@/interfaces';
 import { tesloApi } from '@/api';
+
 
 
 
@@ -25,12 +27,18 @@ interface Props extends PropsWithChildren {}
 export const AuthProvider:FC<Props> = ({children}) => {
 
     const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
+    const router = useRouter();
 
     useEffect(() => {
         checkToken();
     }, [])
     
     const checkToken = async () => {
+        
+        if (!Cookies.get('token')) {
+            return;
+        }
+
         try {
             const {data} = await tesloApi.get('/user/validate-token');
             const {token, user} = data;
@@ -82,7 +90,12 @@ export const AuthProvider:FC<Props> = ({children}) => {
                 message: 'No se pudo crear el usuario - intente de nuevo',
             }
         }
+    }
 
+    const logout = () => {
+        Cookies.remove('token');
+        Cookies.remove('cart');
+        router.reload();
     }
 
 
@@ -93,6 +106,7 @@ export const AuthProvider:FC<Props> = ({children}) => {
             //Methods
             loginUser,
             registerUser,
+            logout,
         }}>
             { children }
         </AuthContext.Provider>

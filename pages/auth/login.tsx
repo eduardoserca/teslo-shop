@@ -8,7 +8,6 @@ import { ErrorOutline } from "@mui/icons-material";
 import { AuthContext } from '@/context';
 import { AuthLayout } from "@/components/layouts";
 import { validations } from "@/utils";
-import { tesloApi } from "@/api";
 import { useRouter } from 'next/router';
 
 
@@ -37,7 +36,8 @@ const LoginPage = () => {
         }
 
         //TODO: Navegar a la pantalla donde el usuario estaba
-        router.replace('/');
+        const destination = router.query.p?.toString() || '/';
+        router.replace( destination );
     }
 
     return (
@@ -100,7 +100,7 @@ const LoginPage = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={12} display='flex' justifyContent='center'>
-                            <NextLink href="/auth/register" passHref legacyBehavior>
+                            <NextLink href={ router.query.p ? `/auth/register?p=${router.query.p}` : '/auth/register'} passHref legacyBehavior>
                                 <Link underline="always">
                                     Regístrate y crea una cuenta
                                 </Link>
