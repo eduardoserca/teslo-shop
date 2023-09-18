@@ -32,7 +32,7 @@ export const authOptions = {
     //Custom Page
     pages: {
         signIn: '/auth/login',
-        newUser: 'auth/register'
+        newUser: '/auth/register'
     },
 
     session:{
