@@ -8,9 +8,8 @@ import { useProducts } from '@/hooks';
 import { FullScreenLoading } from '@/components/ui';
 
 
-
-
 const Home: NextPage = () => {
+
 
   const {products, isLoading} = useProducts('/products');
 

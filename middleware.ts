@@ -1,25 +1,25 @@
+import { getToken } from "next-auth/jwt";
 import { NextFetchEvent, NextRequest, NextResponse  } from "next/server";
-
-import { jwt } from "@/utils";
-
 
 export async function middleware(req: NextRequest, ev:NextFetchEvent){
     
-    const token = req.cookies.get('token');
-    const requestedPage = req.nextUrl.pathname;
+    const session =  await getToken({req, secret:process.env.NEXTAUTH_SECRET});
     
-    try {
-        const { value } = token as {name:string, value:string};            
-        await jwt.isValidTokenByJoseLib( value );    
-        return NextResponse.next();  
+    if(!session) {
+        const requestedPage = req.nextUrl.pathname;
+        const url = req.nextUrl.clone();
+        url.pathname = `/auth/login`;
+        url.search = `p=${requestedPage}`;
 
-    } catch (error) {
-        return NextResponse.redirect(new URL(`/auth/login?p=${requestedPage}`, req.url));
+        return NextResponse.redirect(url);
     }
+
+    return NextResponse.next();
     
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: '/checkout/:path*',
+    //matcher: '/checkout/:path*',
+    matcher: ['/checkout/address', '/checkout/summary'],
 }

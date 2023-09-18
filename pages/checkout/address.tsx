@@ -33,6 +33,7 @@ const getAddressFromCookies = ():FormData => {
 const AddressPage = () => {
 
     const router =  useRouter();
+    
     const { updateAddress, shippingAddress } = useContext(CartContext);
     
 
