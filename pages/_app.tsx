@@ -8,9 +8,15 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { SWRConfig } from 'swr'
 import { AuthProvider, CartProvider, UiProvider } from '@/context'
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ 
+
+    Component, 
+    pageProps: { session, ...pageProps }, 
+
+  }: AppProps) {
+
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
 
       <SWRConfig 
         value={{
