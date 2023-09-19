@@ -28,9 +28,9 @@ export const authOptions = {
             }),
             // ...add more providers here
     ],
-    
+
     //agregado para desplegar en Vercel
-    secret: process.env.SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
 
     //Custom Page
     pages: {
