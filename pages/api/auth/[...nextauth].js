@@ -30,7 +30,8 @@ export const authOptions = {
     ],
 
     //agregado para desplegar en Vercel
-    secret: process.env.NEXTAUTH_SECRET,
+    //secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXT_PUBLIC_SECRET,
 
     //Custom Page
     pages: {
