@@ -13,16 +13,15 @@ export const authOptions: NextAuthOptions = {
     providers: [
         
         Credentials({
-            name:' Custom Login',
+            name: 'Custom Login',
             credentials: {
-                email:{ label:'Correo:', type:'email', placeholder: 'correo@google.com' },
-                password:{ label:'Contraseña:', type:'password', placeholder: 'contraseña' },
+                email: { label: 'Correo:', type: 'email', placeholder: 'correo@google.com'  },
+                password: { label: 'Contraseña:', type: 'password', placeholder: 'Contraseña'  },
             },
-            async authorize(credentials){                
-                //TODO: validar credenciales
-                return await dbUsers.checkUserEmailPassword(credentials!.email, credentials!.password);
-            }
 
+            async authorize(credentials) {
+                return await dbUsers.checkUserEmailPassword( credentials!.email, credentials!.password );
+            }
         }),
 
         GithubProvider({
