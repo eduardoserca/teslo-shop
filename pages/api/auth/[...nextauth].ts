@@ -1,11 +1,10 @@
 import NextAuth  from "next-auth";
 import type { NextAuthOptions } from 'next-auth';
 
-
 import GithubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
+
 import {dbUsers} from "../../../database";
-import User from '../../../models/User';
 
 
 export const authOptions: NextAuthOptions = {
@@ -52,6 +51,7 @@ export const authOptions: NextAuthOptions = {
 
     //Callbacks
     callbacks:{
+
         async jwt({ token, account, user }) {
 
             if( account ){
