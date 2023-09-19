@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import NextLink from "next/link";
 import { useForm } from "react-hook-form";
 import { signIn , getSession, getProviders } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from './../api/auth/[...nextauth]';
 
 import { Box, Grid, Typography, TextField, Button, Link, Chip, Divider } from '@mui/material';
 import { ErrorOutline } from "@mui/icons-material";
@@ -152,8 +154,11 @@ const LoginPage = () => {
 }
 
 
-export const getServerSideProps: GetServerSideProps = async ({req, query }) => {
-    const session = await getSession({req});
+export const getServerSideProps: GetServerSideProps = async ({req, res, query }) => {
+    //const session = await getSession({req});
+    
+    const session = await getServerSession(req, res, authOptions );
+
     const { p='/'} = query;
 
     if(session){
