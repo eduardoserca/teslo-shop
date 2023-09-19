@@ -5,6 +5,7 @@ import type { NextAuthOptions } from 'next-auth';
 import GithubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import {dbUsers} from "../../../database";
+import User from '../../../models/User';
 
 
 export const authOptions: NextAuthOptions = {
@@ -20,7 +21,10 @@ export const authOptions: NextAuthOptions = {
             },
 
             async authorize(credentials) {
-                return await dbUsers.checkUserEmailPassword( credentials!.email, credentials!.password );
+                
+                const { _id, email, role, name }  = await dbUsers.checkUserEmailPassword( credentials!.email, credentials!.password );
+                
+                return { _id, email, role, name } as any;
             }
         }),
 
