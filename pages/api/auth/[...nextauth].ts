@@ -64,10 +64,8 @@ export const authOptions: NextAuthOptions = {
                     case 'credentials':
                         token.user = user;
                         break;
-                    
                 }
             }
-
             return token;
         },
 

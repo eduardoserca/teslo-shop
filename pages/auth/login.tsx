@@ -41,9 +41,6 @@ const LoginPage = () => {
 
     const onLoginUser = async({email, password}: FormData) => {
         setShowError(false);
-
-        
-
         await signIn('credentials', {email, password});
     }
 

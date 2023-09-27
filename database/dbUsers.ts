@@ -28,7 +28,7 @@ export const checkUserEmailPassword = async (email:string, password:string) => {
 
 /** Esta función crea o verifica un usuario de OAuth */
 export const oAuthToDbUser = async (oAuthEmail:string, oAuthName:string) => {
-    console.log('CESC: oAuthToDbUser')
+    
     await db.connect();
     const user = await User.findOne({ email: oAuthEmail });
 

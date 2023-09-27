@@ -4,11 +4,22 @@ import { CartContext } from '@/context';
 import { currency } from '@/utils';
 
 interface Props {
+    orderValues?: {
+        numberOfItems: number;
+        subTotal: number;
+        tax: number;
+        total: number;
+    }
 
 }
-export const OrderSummary:FC<Props> = ({}) => {
 
-    const { numberOfItems, subTotal, tax, total} = useContext(CartContext);
+export const OrderSummary:FC<Props> = ({ orderValues }) => {
+
+    const summaryValues = useContext(CartContext);    
+
+    const { numberOfItems, subTotal, tax, total} = orderValues ? orderValues : summaryValues
+
+    
     
     return (
         <Grid container>
