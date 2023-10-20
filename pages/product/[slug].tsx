@@ -30,7 +30,7 @@ const ProductPage:NextPage<Props> = ({product}) => {
   const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
     _id: product._id,
     description: product.description,
-    image: product.images[0],
+    image: product.images[0].path,
     price: product.price,
     size: undefined,
     slug: product.slug,

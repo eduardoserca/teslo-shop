@@ -54,6 +54,7 @@ export const getServerSideProps: GetServerSideProps = async ({params}) => {
     }
 
     let products = await dbProducts.getProductByTerm(query);
+    
     const foundProducts = products.length > 0;
     
     if(!foundProducts){
@@ -62,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async ({params}) => {
 
     return {
         props: {
-            products,
+            products: JSON.parse(JSON.stringify(products)),
             foundProducts,
             query,
         }

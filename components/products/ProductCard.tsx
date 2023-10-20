@@ -14,8 +14,8 @@ export const ProductCard:FC<Props> = ({product}) => {
 
     const productImage = useMemo(() => {
         return isHovered 
-            ? `/products/${product.images[1]}` 
-            : `/products/${product.images[0]}`
+            ? ( product.images[1].path.includes('cloudinary.com') ? product.images[1].path : `/products/${product.images[1].path}`) 
+            : ( product.images[0].path.includes('cloudinary.com') ? product.images[0].path : `/products/${product.images[0].path}`)
     }, [isHovered, product.images]);
 
     return (        
@@ -57,7 +57,7 @@ export const ProductCard:FC<Props> = ({product}) => {
             </Box>
 
         </Grid>
-  )
+    )
 }
 
 

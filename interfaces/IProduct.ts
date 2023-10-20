@@ -1,7 +1,9 @@
 export interface IProduct {
     _id:string;
     description: string;
-    images: string[];
+    //images: string[];
+    images: IImage[];
+
     inStock: number;
     price: number;
     sizes: ISize[];
@@ -14,6 +16,11 @@ export interface IProduct {
     //TODO: agregar createdAt y updatedAt
     createdAt: string;
     updatedAt: string;
+}
+
+export interface IImage {
+    id  :   string,
+    path:   string,
 }
 
 export type ISize = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
