@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { SHOP_CONSTANTS, db, seedDatabase } from '@/database';
+import { SHOP_CONSTANTS, db } from '@/database';
 import { Product } from '@/models';
 import { IProduct } from '@/interfaces';
 

@@ -43,8 +43,6 @@ const OrdersPage = () => {
     const {data, error} = useSWR<IOrder[]>('/api/admin/orders');
 
     if( !data && !error) return (<>Cargando...</>);
-    
-    console.log({data});
 
     const rows = data!.map( order => ({
         id: order._id,

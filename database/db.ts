@@ -11,36 +11,44 @@ const mongoConnection = {
 }
 
 export const connect = async() => {
-
-    if ( mongoConnection.isConnected ) {
-        console.log('Ya estabamos conectados');
-        return;
-    }
-
-    if ( mongoose.connections.length > 0 ) {
-        mongoConnection.isConnected = mongoose.connections[0].readyState;
+    try {        
 
         if ( mongoConnection.isConnected === 1 ) {
-            console.log('Usando conexión anterior');
+            console.log('connect -> Ya estábamos conectados');
             return;
         }
 
-        await mongoose.disconnect();
+        if ( mongoose.connections.length > 0 ) {
+            
+            if(mongoose.connections[0].readyState === 1){//Ya existe una conexión y se reutiliza
+                mongoConnection.isConnected = mongoose.connections[0].readyState;                
+                console.log('connect -> Usando conexión anterior');
+                return; 
+            }
+        }
+        
+        await mongoose.connect( process.env.MONGO_URL || '');
+        mongoConnection.isConnected = 1;
+        console.log('connect -> Conectado a MongoDB:', process.env.MONGO_URL );
+        
+    } catch (error) {
+        console.log('connect -> Error al conectarse a la BD' );
+        console.log(error);
     }
 
-    await mongoose.connect( process.env.MONGO_URL || '');
-    mongoConnection.isConnected = 1;
-    console.log('Conectado a MongoDB:', process.env.MONGO_URL );
+    
 }
 
 export const disconnect = async() => {
     
-    if ( process.env.NODE_ENV === 'development' ) return;
-
-    if ( mongoConnection.isConnected === 0 ) return;
+    //if ( process.env.NODE_ENV === 'development' ) return;
+    
+    if ( mongoConnection.isConnected === 0 ) {
+        return;
+    }
 
     await mongoose.disconnect();
     mongoConnection.isConnected = 0;
-
-    console.log('Desconectado de MongoDB');
+    
+    console.log('disconnect -> Desconectado de MongoDB');
 }

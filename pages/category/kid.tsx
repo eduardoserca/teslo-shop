@@ -1,25 +1,25 @@
 import { ShopLayout } from "@/components/layouts"
 import { ProductList } from "@/components/products";
 import { FullScreenLoading } from "@/components/ui";
-import { useProducts } from "@/hooks";
+import { IProduct } from "@/interfaces";
 import { Typography } from "@mui/material"
+import useSWR from "swr";
 
 
 const KidPage = () => {
+  
+  const { data, error } = useSWR<IProduct[]>('/api/products?gender=kid'); 
 
-  const {products, isLoading} = useProducts('/products?gender=kid');
+  if( !data && !error) {
+    return (<FullScreenLoading />);
+  }
 
   return (
     <ShopLayout title='Teslo-Shop - Kid' pageDescription='Ropa para niños'>
       <Typography variant='h1' component='h1'>Niños</Typography>
       <Typography variant='h2' sx={{mb:1}}>Ropa para niños</Typography>
       
-      {
-        isLoading 
-          ? <FullScreenLoading />
-          : <ProductList products={ products } />
-      }     
-
+      <ProductList products={ data } />
 
     </ShopLayout> 
   )
