@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import formidable from "formidable";
+import multiparty from 'multiparty';
 import {v2 as cloudinary } from "cloudinary";
 import { IImage } from '@/interfaces';
+
 
 cloudinary.config( process.env.CLOUDINARY_URL || '');
 
@@ -29,31 +30,40 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
     
 }
 
-const saveFile =async (file: formidable.File ): Promise<{public_id:string, secure_url:string}> => {
-    const {public_id, secure_url } = await cloudinary.uploader.upload( file.filepath );
-    return {public_id, secure_url };    
-}
-
-const parseFiles = async (req: NextApiRequest):Promise<{public_id:string, secure_url:string}> => {
-
-    return new Promise((resolve, reject) => {
-
-        const form = new formidable.IncomingForm();
-        form.parse( req, async(err, fields, files) => {
-            if( err ){
-                return reject(err);
-            }
-
-            const {public_id, secure_url } = await saveFile( files.file as formidable.File);
-            resolve({public_id, secure_url });
-        } )
-    });
-}
 
 const uploadFile = async (req: NextApiRequest, res: NextApiResponse<Data>) => {    
+
     const {public_id, secure_url } = await parseFiles(req);
     const image: IImage = {id: public_id, path: secure_url};
     return res.status(200).json(image);
+}
+
+const parseFiles = async (req: NextApiRequest):Promise<{public_id:string, secure_url:string}> => {
+    const form = new multiparty.Form();
+
+    return await new Promise((resolve,reject) => {
+
+        form.parse(req, async(err, fields, files) => {
+
+            if (err){
+                reject(err);
+            }
+            
+            for(const {path} of files.file){
+                const {public_id, secure_url } = await saveFile( path );
+                resolve({public_id,secure_url});            
+            }   
+        });
+
+    });
+    
+}
+
+const saveFile =async (path: string ): Promise<{public_id:string, secure_url:string}> => {
+    
+    const {public_id, secure_url } = await cloudinary.uploader.upload( path );
+
+    return {public_id, secure_url };    
 }
 
 const deleteFile = async (req: NextApiRequest, res: NextApiResponse<Data>) => {

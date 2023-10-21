@@ -2,7 +2,7 @@ import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { AdminLayout } from '../../../components/layouts'
-import { IImage, IProduct, ISize, IType } from '../../../interfaces';
+import { IImage, IProduct, ISize, IType, IGender } from '../../../interfaces';
 import { DriveFileRenameOutline, SaveOutlined, UploadOutlined } from '@mui/icons-material';
 import { dbProducts } from '../../../database';
 import { Box, Button, capitalize, Card, CardActions, CardMedia, Checkbox, Chip, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, ListItem, Paper, Radio, RadioGroup, TextField } from '@mui/material';
@@ -12,8 +12,8 @@ import { Product } from '@/models';
 
 
 
-const validTypes  = ['shirts','pants','hoodies','hats']
-const validGender = ['men','women','kid','unisex']
+const validTypes:string[]  = ['shirts','pants','hoodies','hats']
+const validGender:string[] = ['men','women','kid','unisex']
 const validSizes = ['XS','S','M','L','XL','XXL','XXXL']
 
 interface FormData{
@@ -94,7 +94,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
             for( const file of target.files ){
                 const formData = new FormData();
                 formData.append('file', file);
-                const { data } = await tesloApi.post<{ message: string}>('/admin/upload', formData);                             
+                const { data } = await tesloApi.post('/admin/upload', formData);                             
                 setValue('images',[...getValues('images'), data], {shouldValidate: true});
             }
 
@@ -150,7 +150,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
 
     }
 
-    const onChangeSize = (size: string) => {
+    const onChangeSize = (size) => {
         const currentSizes = getValues('sizes');
         if(currentSizes.includes(size)){
             return setValue('sizes', currentSizes.filter(s => s !== size ), {shouldValidate: true});
@@ -244,7 +244,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             <RadioGroup
                                 row
                                 value={ getValues('type') }
-                                onChange={ ({target})=> setValue('type', target.value, {shouldValidate:true}) }
+                                onChange={ ({target})=> setValue('type', target.value as IType, {shouldValidate:true}) }
                             >
                                 {
                                     validTypes.map( option => (
@@ -264,7 +264,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                             <RadioGroup
                                 row
                                 value={ getValues('gender') }
-                                onChange={ ({target})=> setValue('gender', target.value, {shouldValidate:true}) }
+                                onChange={ ({target})=> setValue('gender', target.value as IGender  , {shouldValidate:true}) }
                             >
                                 {
                                     validGender.map( option => (
@@ -285,7 +285,7 @@ const ProductAdminPage:FC<Props> = ({ product }) => {
                                 validSizes.map(size => (
                                     <FormControlLabel 
                                         key={size} 
-                                        control={<Checkbox checked={ getValues('sizes').includes(size)}/>} 
+                                        control={<Checkbox checked={ getValues('sizes').includes(size as ISize)}/>} 
                                         onChange={ ()=> onChangeSize( size) }
                                         label={ size } />
                                 ))
